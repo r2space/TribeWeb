@@ -1,5 +1,5 @@
 
-var i18n    = require('i18n')
+var i18n = require('i18n')
   , smart = require('../../SmartCore');
 
 /**
@@ -158,7 +158,7 @@ exports.guiding = function(app){
     });
   });
   app.get('/group/:id', function(req, res){
-    smart.core.checker.checkGroup(req, res, req.params.id, function(err, bool){
+    smart.core.authorityChecker.checkGroup(req, res, req.params.id, function(err, bool){
       if(!bool){
         res.render("error", {
           title: __("error"), 
