@@ -1,5 +1,5 @@
-var log = require('../../SmartCore').core.log
-  , common = require('../../SmartCore').api.common;
+var log = lib.core.log
+  , common = lib.api.common;
 
 /**
  * GuidingFileApi:

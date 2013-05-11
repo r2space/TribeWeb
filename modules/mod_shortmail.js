@@ -6,13 +6,13 @@
 
 var mongo = require('mongoose')
   , util = require('util')
-  , log = require('../../SmartCore').core.log
+  , log = lib.core.log
   , conn = require('./connection')
   , dbconf = require('config').db
   , _ = require('underscore')
   , sync = require('async')
   , schema = mongo.Schema
-  , user = require('../../SmartCore').mod.user;
+  , user = lib.mod.user;
 
 function model() {
   return conn().model('ShortMail', ShortMail);

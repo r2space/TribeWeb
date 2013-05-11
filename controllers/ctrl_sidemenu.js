@@ -1,11 +1,11 @@
 
 var sync      = require("async")
   , _         = require('underscore')
-  , user      = require("../../SmartCore").ctrl.user
-  , group     = require("../../SmartCore").ctrl.group
+  , user      = lib.ctrl.user
+  , group     = lib.ctrl.group
   , message   = require("./ctrl_message")
   , shortmail = require("./ctrl_shortmail")
-  , util      = require('../../SmartCore').core.util;
+  , util      = lib.core.util;
 
 /**
  * 消息

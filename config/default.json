@@ -52,6 +52,7 @@
     , "queue": "true"
     , "port": 3000
     , "timeout": 1
+    , "libs": "../SmartCore"
   },
   
   "mq": {

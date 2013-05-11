@@ -2,7 +2,7 @@
 var async = require("async")
   , _ = require("underscore")
   , shortmail = require('../modules/mod_shortmail')
-  , ctrl_user = require("../../SmartCore").ctrl.user;
+  , ctrl_user = lib.ctrl.user;
 
 exports.getMailUser = function(_id, callback_){
 

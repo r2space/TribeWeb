@@ -1,7 +1,7 @@
 
 var topic = require('../modules/mod_topic');
-var util = require('../../SmartCore').core.util;
-var error = require('../../SmartCore').core.errors;
+var util = lib.core.util;
+var error = lib.core.errors;
 var check = require("validator").check;
 var underscore = require("underscore");
 

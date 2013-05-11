@@ -1,10 +1,10 @@
 var message = require('../controllers/ctrl_message')
   , api_message = require('../api/message')
-  , amqp = require('../../SmartCore').core.amqp
-  , util = require('../../SmartCore').core.util
-  , json = require('../../SmartCore').core.json
-  , dbfile = require("../../SmartCore").ctrl.dbfile
-  , notification = require('../../SmartCore').ctrl.notification;
+  , amqp = lib.core.amqp
+  , util = lib.core.util
+  , json = lib.core.json
+  , dbfile = lib.ctrl.dbfile
+  , notification = lib.ctrl.notification;
 
 /**
  * createMessage:

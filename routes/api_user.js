@@ -1,6 +1,6 @@
 
-var log = require('../../SmartCore').core.log
-  , user = require('../../SmartCore').api.user;
+var log = lib.core.log
+  , user = lib.api.user;
 
 /**
  * GuidingUserApi:
@@ -41,6 +41,7 @@ exports.guiding = function(app){
 
   //得到所有用户列表
   app.get("/user/list.json", function(req, res){
+    console.log(__dirname);
     user.getUserList(req, res);
   });
 

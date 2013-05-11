@@ -5,8 +5,8 @@
 
 var util = require('util')
   , i18n = require('i18n')
-  , log  = require('../../SmartCore').core.log
-  , json = require('../../SmartCore').core.json
+  , log  = lib.core.log
+  , json = lib.core.json
   , sidemenu = require("../controllers/ctrl_sidemenu");
 
 /**

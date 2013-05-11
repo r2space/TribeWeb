@@ -1,6 +1,6 @@
 
-var log = require('../../SmartCore').core.log
-  , group = require('../../SmartCore').api.group;
+var log   = lib.core.log
+  , group = lib.api.group;
 
 /**
  * GuidingGroupApi:

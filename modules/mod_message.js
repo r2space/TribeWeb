@@ -5,9 +5,9 @@
 
 var mongo = require('mongoose')
   , util = require('util')
-  , log = require('../../SmartCore').core.log
+  , log = lib.core.log
   , conn = require('./connection')
-  , solr = require('../../SmartCore').core.solr
+  , solr = lib.core.solr
   , schema = mongo.Schema;
 
 

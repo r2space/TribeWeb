@@ -1,7 +1,7 @@
 var mongo = require('mongoose')
   , util = require('util')
-  , log = require('../../SmartCore').core.log
-  , tools = require('../../SmartCore').core.util
+  , log = lib.core.log
+  , tools = lib.core.util
   , conn = require('./connection')
   , dbconf = require('config').db
   , schema = mongo.Schema;

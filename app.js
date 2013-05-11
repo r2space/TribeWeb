@@ -3,17 +3,31 @@
  * Module dependencies.
  */
 
+/**
+ * 定义库的路径（全局变量）
+ */
+Object.defineProperty(global, 'lib', {
+  get: function(){
+    return require("" + __dirname + path.sep + confapp.libs);
+  }
+});
+
+
+/**
+ * 添加参照
+ */
 var express     = require("express")
   , http        = require("http")
   , i18n        = require("i18n")
+  , path        = require("path")
   , store       = require("connect-mongo")(express)
   , confdb      = require("config").db
   , confsession = require("config").session
   , confapp     = require("config").app
   , confcookie  = require("config").cookie
   , routes      = require("./routes")
-  //, middleware  = require('../SmartCore').core.middleware
-  , middleware  = require('./core/middleware')
+  , middleware  = require('./core/middleware');
+
 
 /**
  * 国际化

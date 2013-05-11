@@ -1,24 +1,24 @@
 var check = require("validator").check
   , async = require("async")
-  , amqp = require('../../SmartCore').core.amqp
+  , amqp = lib.core.amqp
   , _ = require("underscore")
   , i18n    = require('i18n')
 
-  , ctrl_notification = require("../../SmartCore").ctrl.notification
-  , ctrl_user = require('../../SmartCore').ctrl.user
-  , fileinfo = require('../../SmartCore').ctrl.dbfile
+  , ctrl_notification = lib.ctrl.notification
+  , ctrl_user = lib.ctrl.user
+  , fileinfo = lib.ctrl.dbfile
 
-  , util = require('../../SmartCore').core.util
-  , error = require('../../SmartCore').core.errors
-  , log = require('../../SmartCore').core.log
-  , process = require('../../SmartCore').core.process
+  , util = lib.core.util
+  , error = lib.core.errors
+  , log = lib.core.log
+  , process = lib.core.process
   , message = require('../modules/mod_message')
 
   // TODO: 要对应  
-  , user = require('../../SmartCore').mod.user
-  , group = require('../../SmartCore').mod.group
+  , user = lib.mod.user
+  , group = lib.mod.group
   , topic = require('../modules/mod_topic')
-  , notification = require('../../SmartCore').mod.notification;
+  , notification = lib.mod.notification;
 
 /**
  *

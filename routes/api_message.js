@@ -1,5 +1,5 @@
 
-var log = require('../../SmartCore').core.log
+var log = lib.core.log
   , message = require('../api/message');
 
 /**

@@ -1,6 +1,6 @@
 var shortmail = require('../controllers/ctrl_shortmail')
-  , amqp = require('../../SmartCore').core.amqp
-  , json = require('../../SmartCore').core.json;
+  , amqp = lib.core.amqp
+  , json = lib.core.json;
 
 /**
  * 发送私有信

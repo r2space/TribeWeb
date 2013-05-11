@@ -9,7 +9,7 @@ var groupapi      = require('./api_group')
   , userapi       = require('./api_user')
   , messageapi    = require('./api_message');
 
-var smart = require('../../SmartCore');
+var smartapi      = lib.api;
 
 /**
  * GuidingApi:
@@ -30,22 +30,22 @@ exports.guiding = function(app){
 
   // 获取图片  
   app.get('/picture/:id', function(req, res){
-    smart.api.dbfile.image(req, res, function(err, doc, info){
+    smartapi.dbfile.image(req, res, function(err, doc, info){
       res.send(doc);
     });
   });
   
   // ---- search ----
   app.get('/search/quick.json', function(req, res){
-    smart.api.search.quick(req, res);
+    smartapi.search.quick(req, res);
   });
 
   app.get('/search/full.json', function(req, res){
-    smart.api.search.full(req, res);
+    smartapi.search.full(req, res);
   });
 
   app.get('/search/user.json', function(req, res){
-    smart.api.search.user(req, res);
+    smartapi.search.user(req, res);
   });
 
   // ---- 私信 ----
@@ -77,17 +77,17 @@ exports.guiding = function(app){
   // ---- 通知 ----
   // 通知一览
   app.get("/notification/list/unread.json", function(req, res){
-    smart.api.notification.getUnreadList(req, res);
+    smartapi.notification.getUnreadList(req, res);
   });
 
   // 通知一览
   app.get("/notification/list.json", function(req, res){
-    smart.api.notification.getList(req, res);
+    smartapi.notification.getList(req, res);
   });
 
   // 更新已读状态
   app.put("/notification/read.json", function(req, res){
-    smart.api.notification.read(req, res);
+    smartapi.notification.read(req, res);
   });
   
 };

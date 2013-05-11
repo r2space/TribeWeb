@@ -2,10 +2,10 @@
 var i18n    = require('i18n')
   , fs      = require('fs')
   , confapp = require("config").app
-  , json    = require('../../SmartCore').core.json
-  , errors  = require('../../SmartCore').core.errors
-  , util    = require('../../SmartCore').core.util
-  , log     = require('../../SmartCore').core.log;
+  , json    = lib.core.json
+  , errors  = lib.core.errors
+  , util    = lib.core.util
+  , log     = lib.core.log;
 
 /**
  * 设定语言
