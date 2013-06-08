@@ -1,6 +1,5 @@
 
 var async = require("async")
-  , _ = require("underscore")
   , shortmail = require('../modules/mod_shortmail')
   , ctrl_user = lib.ctrl.user;
 
@@ -9,7 +8,7 @@ exports.getMailUser = function(_id, callback_){
   var tasks = [];
   var task_getUsers = function(cb){
 
-  shortmail.getMailUser2(_id, function(err, users){
+    shortmail.getMailUser2(_id, function(err, users){
       err = err ? new error.InternalServer(err) : null;
       if (err) {
         return callback_(err);
