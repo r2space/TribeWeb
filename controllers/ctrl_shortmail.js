@@ -29,7 +29,7 @@ exports.getContacts = function(uid_, firstLetter_, start_, limit_, callback_){
 
   var tasks = [];
   var task_getUsers = function(cb){
-    ctrl_user.getUserList("all", firstLetter_, uid_, start_, limit_, function(err, users){
+    ctrl_user.getUserList({"kind":"all", "firstLetter":firstLetter_, "uid":uid_, "start":start_, "limit":limit_}, function(err, users){
       err = err ? new error.InternalServer(err) : null;
       if (err) {
         return callback_(err);
