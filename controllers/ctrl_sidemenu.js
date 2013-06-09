@@ -66,7 +66,7 @@ exports.user = function(uid_, callback_) {
     // 获取给定用户的好友
     function(callback) {
 
-      user.getUserList("following", "", uid_, 0, 20, function(err, result) {
+      user.getUserList({"kind":"following", "firstLetter":"", "uid":uid_, "start":0, "limit":20}, function(err, result) {
         callback(err, result);
       });
     },

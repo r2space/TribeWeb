@@ -10,13 +10,13 @@ exports.getMailUser = function(_id, callback_){
   var task_getUsers = function(cb){
 
     shortmail.getMailUser2(_id, function(err, users){
-        err = err ? new errors.InternalServer(err) : null;
-        if (err) {
-          return callback_(err);
-        } else {
-          cb(err, users);
-        }
-      });
+      err = err ? new error.InternalServer(err) : null;
+      if (err) {
+        return callback_(err);
+      } else {
+        cb(err, users);
+      }
+    });
   };
   tasks.push(task_getUsers);
   
@@ -29,8 +29,8 @@ exports.getContacts = function(uid_, firstLetter_, start_, limit_, callback_){
 
   var tasks = [];
   var task_getUsers = function(cb){
-    ctrl_user.getUserList("all", firstLetter_, uid_, start_, limit_, function(err, users){
-      err = err ? new errors.InternalServer(err) : null;
+    ctrl_user.getUserList({"kind":"all", "firstLetter":firstLetter_, "uid":uid_, "start":start_, "limit":limit_}, function(err, users){
+      err = err ? new error.InternalServer(err) : null;
       if (err) {
         return callback_(err);
       } else {
