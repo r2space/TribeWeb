@@ -2,7 +2,7 @@
 var async = require("async")
   , shortmail = require('../modules/mod_shortmail')
   , ctrl_user = lib.ctrl.user
-  , errors = lib.core.errors;
+  , error = lib.core.errors;
 
 exports.getMailUser = function(_id, callback_){
 
