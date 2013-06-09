@@ -1,6 +1,5 @@
-var check = require("validator").check
-  , async = require("async")
-  , amqp = lib.core.amqp
+var async = require("async")
+  // , amqp = lib.core.amqp
   , _ = require("underscore")
   , i18n    = require('i18n')
 
@@ -8,9 +7,9 @@ var check = require("validator").check
   , ctrl_user = lib.ctrl.user
   , fileinfo = lib.ctrl.dbfile
 
-  , util = lib.core.util
+  // , util = lib.core.util
   , error = lib.core.errors
-  , log = lib.core.log
+  // , log = lib.core.log
   , process = lib.core.process
   , message = require('../modules/mod_message')
 
@@ -30,33 +29,33 @@ exports.createMessage = function(currentuid_, params_, callback_){
     , contentType = params_.contentType
     , attach = params_.attach
     , target = params_.target
-    , tousers = params_.tousers
-    , togroups = params_.togroups
+    // , tousers = params_.tousers
+    // , togroups = params_.togroups
     , range = params_.range || 1
     , at = params_.at
     , type = params_.type || 1
     , currentdate = Date.now();
 
   var newMessage = {};
-  newMessage["type"] = type;
+  newMessage.type = type;
   if(target){
-    newMessage["target"] = target;
+    newMessage.target = target;
   }
   if(attach){
-    newMessage["attach"] = attach;
+    newMessage.attach = attach;
   }
 
   if(at){
-    newMessage["at"] = at;
+    newMessage.at = at;
   }
 
-  newMessage["range"] = range;
-  newMessage["contentType"] = contentType;
-  newMessage["content"] = content;
-  newMessage["createby"] = currentuid_;
-  newMessage["createat"] = currentdate;
-  newMessage["editby"] = currentuid_;
-  newMessage["editat"] = currentdate;
+  newMessage.range = range;
+  newMessage.contentType = contentType;
+  newMessage.content = content;
+  newMessage.createby = currentuid_;
+  newMessage.createat = currentdate;
+  newMessage.editby = currentuid_;
+  newMessage.editat = currentdate;
 
   message.create(newMessage, function(err, msg){
     if (err) {
@@ -93,22 +92,22 @@ exports.copyMessage = function(currentuid_, params_, callback_){
   // 2.转发original message
   var task_saveMsg = function(original, cb){
     var newMessage = {};
-    newMessage["type"] = original.type;
-    newMessage["target"] = target;
+    newMessage.type = original.type;
+    newMessage.target = target;
     
     if(original.attach){
-      newMessage["attach"] = original.attach;
+      newMessage.attach = original.attach;
     }
 
-    newMessage["at"] = at;
+    newMessage.at = at;
     
-    newMessage["range"] = range;
-    newMessage["contentType"] = original.contentType;
-    newMessage["content"] = content + i18n.__("message.forward.label.forward") + original.content;
-    newMessage["createby"] = currentuid_;
-    newMessage["createat"] = currentdate;
-    newMessage["editby"] = currentuid_;
-    newMessage["editat"] = currentdate;
+    newMessage.range = range;
+    newMessage.contentType = original.contentType;
+    newMessage.content = content + i18n.__("message.forward.label.forward") + original.content;
+    newMessage.createby = currentuid_;
+    newMessage.createat = currentdate;
+    newMessage.editby = currentuid_;
+    newMessage.editat = currentdate;
 
     message.create(newMessage, function(err, msg){
       err = err ? new error.InternalServer(err) : null;
@@ -117,7 +116,7 @@ exports.copyMessage = function(currentuid_, params_, callback_){
       //     _id: message_.at.users
       //   , msg: "1"
       // });
-      callback_(err, msg);
+      cb(err, msg);
     });
   };
   tasks.push(task_saveMsg);
@@ -132,7 +131,7 @@ exports.deleteMessage = function (mid_, callback_){
     return callback_(new error.BadRequest("消息ID不能为空"));
   }
 
-  message.delete(mid_, function(err, msg){
+  message.remove(mid_, function(err, msg){
     err = err ? new error.InternalServer(err) : null;
     return callback_(err, msg);
   });
@@ -176,15 +175,13 @@ exports.getMessageList = function(option_, start_, count_, callback_){
       });
     };
     tasks.push(task_getUidsOfGroups);
-  } 
-  else if("group-homepage" == type) {
+  } else if("group-homepage" == type) {
     // 组内的发言
     var task_getGids = function(cb){
       cb("",{"range" : [gid_]});
     };
     tasks.push(task_getGids);
-  }
-  else if("topPage" == type){
+  } else if("topPage" == type){
     // 1.我关注人的发言+我的发言
     var task_getUids = function(cb){
       user.at(login,function(err,user){
@@ -198,7 +195,7 @@ exports.getMessageList = function(option_, start_, count_, callback_){
     tasks.push(task_getUids);
 
     // 2.相关组的发言
-    var task_getUidsOfGroups = function(uids, cb){
+    var task_getUidsOfGroups2 = function(uids, cb){
       group.getAllGroupByUid(login,function(err, groups){
         err = err ? new error.InternalServer(err) : null;
         var gids = [];
@@ -208,7 +205,7 @@ exports.getMessageList = function(option_, start_, count_, callback_){
         cb(err,{uids:uids,range:gids});
       });
     };
-    tasks.push(task_getUidsOfGroups);
+    tasks.push(task_getUidsOfGroups2);
 
     // TODO
     //3.followed文件的动态
@@ -224,7 +221,7 @@ exports.getMessageList = function(option_, start_, count_, callback_){
 
   // 消息
   var task_getMsgs = function(option, cb){
-    option["before"] = option_.before;
+    option.before = option_.before;
     message.list(option, start_, count_, timeline, function(err, retmsg){
       err = err ? new error.InternalServer(err) : null;
       cb(err, retmsg);
@@ -251,7 +248,7 @@ exports.getMessageList = function(option_, start_, count_, callback_){
     async.forEach(msgs.items, function(msg, cb_) {
       if(msg.range != "1"){
         group.at(msg.range, function(err, u) {
-          msg.part["range"] = {id: u._id, name: u.name, photo: u.photo};
+          msg.part.range = {id: u._id, name: u.name, photo: u.photo};
           cb_(err);
         });
       } else {
@@ -275,7 +272,7 @@ exports.getMessageList = function(option_, start_, count_, callback_){
             user.find({"_id": {$in: tousers}}, function(err, users) {
               var array = [];
               _.each(users,function(u){array.push({id: u._id, name: u.name, photo: u.photo});});
-              msg.part["atusers"] = array;
+              msg.part.atusers = array;
               callback(err);
             });
           }else{
@@ -296,7 +293,7 @@ exports.getMessageList = function(option_, start_, count_, callback_){
               group.find({"_id": {$in: gids}}, function(err, groups) {
                 var array = [];
                 _.each(groups,function(u){array.push({id: u._id, name: u.name, photo: u.photo});});
-                msg.part["atgroups"] = array;
+                msg.part.atgroups = array;
                 callback(err);
               });
             });
@@ -319,7 +316,7 @@ exports.getMessageList = function(option_, start_, count_, callback_){
   var task_getRepMsgs = function(msgs, cb) {
     async.forEach(msgs.items, function(msg, cb_) {
       message.replyListNum(msg._id, function(err, repmsgs) {
-        msg.part["replyNums"] = repmsgs;
+        msg.part.replyNums = repmsgs;
         cb_(err);
       });
     }, function(err) {
@@ -333,7 +330,7 @@ exports.getMessageList = function(option_, start_, count_, callback_){
   var task_getFwdMsgs = function(msgs, cb) {
     async.forEach(msgs.items, function(msg, cb_) {
       message.forwardListNum(msg._id, function(err, forwardNums) {
-        msg.part["forwardNums"] = forwardNums;
+        msg.part.forwardNums = forwardNums;
         cb_(err);
       });
     }, function(err) {
@@ -353,7 +350,7 @@ exports.getMessageList = function(option_, start_, count_, callback_){
         });
         // var condition = {"_id": {"$in": fids}};
         fileinfo.getByIds(fids, function(err, result){
-          msg.part["documents"] = result;
+          msg.part.documents = result;
           cb_(err);
         });
       } else {
@@ -372,7 +369,7 @@ exports.getMessageList = function(option_, start_, count_, callback_){
     
     async.forEach(msgs.items, function(msg, cb_) {
       notification.find({"objectid" : msg._id}, function(err, notification) {
-        msg.part["notification"] = notification;
+        msg.part.notification = notification;
         cb_(err);
       });
     }, function(err) {
@@ -428,15 +425,15 @@ exports.getProfileMessage = function(uid_, start_, count_, timeline_, callback_)
       topic.find({"member": uid_}, function(err, topics){
         callback(err, topics);
       });
-    },
+    }
   }, 
   function(err, results){
     if(err){
       return callback_(new error.InternalServer(err));
     }else{
       var friendIds = results.user.friends;
-      var groupIds = new Array();
-      var topicIds = new Array();
+      var groupIds = [];
+      var topicIds = [];
 
       for(var i = 0; i < results.groups.length; i++){
         groupIds.push(results.groups[i]._id);
@@ -449,7 +446,7 @@ exports.getProfileMessage = function(uid_, start_, count_, timeline_, callback_)
         if(err){
           return callback_(new error.InternalServer(err));
         }else{
-          var retMessages = new Array();
+          var retMessages = [];
           async.forEachSeries(msgs, function(msg, cb){
             async.parallel({
               group: function(callback){
@@ -491,17 +488,17 @@ exports.getProfileMessage = function(uid_, start_, count_, timeline_, callback_)
             }, function(err, r){
               if(r.group){
                 delete(msg._doc.createin.gid);
-                msg._doc.createin["group"] = r.group;
+                msg._doc.createin.group = r.group;
               }
               if(r.topic){
                 delete(msg._doc.createin.tid);
-                msg._doc.createin["topic"] = r.topic;
+                msg._doc.createin.topic = r.topic;
               }
               if(r.user){
                 msg._doc.createby = r.user;
               }
               if(r.originalmsg){
-                msg._doc["originalmsg"] = r.originalmsg;
+                msg._doc.originalmsg = r.originalmsg;
               }
               retMessages.push(msg);
               cb();
@@ -588,7 +585,7 @@ exports.addReply = function(content_, notifyto_, replyto_, by_, at_, attach_, ca
   if(notifyto_){
     notifyto_ = notifyto_.split(",");
   } else {
-    notifyto_ = new Array();
+    notifyto_ = [];
   }
 
 
@@ -600,7 +597,7 @@ exports.addReply = function(content_, notifyto_, replyto_, by_, at_, attach_, ca
     , "attach": attach_
     , "createat": at_
     , "createby": by_
-  };
+    };
 
   var tasks = [];
   var task_getRepliedMsg = function(cb){
@@ -638,8 +635,7 @@ exports.addReply = function(content_, notifyto_, replyto_, by_, at_, attach_, ca
   tasks.push(task_getUsrInfo);
 
   async.waterfall(tasks,function(err,rpl){
-
-      return callback_(err, rpl);
+    return callback_(err, rpl);
   });
 
 };
@@ -653,7 +649,7 @@ exports.getMessage = function(mid_, login_, callback_){
   }
 
   exports.getMessageList({"mid": mid_, "login":login_}, 0, 20, function(err, result) {
-    callback_(err,result.items[0])
+    callback_(err,result.items[0]);
   });
 };
 
@@ -767,7 +763,7 @@ exports.getForwardList = function(mid_, start_, count_, callback_){
     async.forEach(msgs.items, function(msg, cb_) {
       if(msg.range != "1"){
         group.at(msg.range, function(err, u) {
-          msg.part["range"] = {id: u._id, name: u.name, photo: u.photo};
+          msg.part.range = {id: u._id, name: u.name, photo: u.photo};
           cb_(err);
         });
       } else {
@@ -791,7 +787,7 @@ exports.getForwardList = function(mid_, start_, count_, callback_){
             user.find({"_id": {$in: tousers}}, function(err, users) {
               var array = [];
               _.each(users,function(u){array.push({id: u._id, name: u.name, photo: u.photo});});
-              msg.part["atusers"] = array;
+              msg.part.atusers = array;
               callback(err);
             });
           }else{
@@ -805,7 +801,7 @@ exports.getForwardList = function(mid_, start_, count_, callback_){
             group.find({"_id": {$in: togroups}}, function(err, groups) {
               var array = [];
               _.each(groups,function(u){array.push({id: u._id, name: u.name, photo: u.photo});});
-              msg.part["atgroups"] = array;
+              msg.part.atgroups = array;
               callback(err);
             });
           }else{
@@ -827,36 +823,39 @@ exports.getForwardList = function(mid_, start_, count_, callback_){
   });
 };
 
-function checkRepostMessage(msg_, callback_){
-  if(msg_ instanceof Array){
-    async.forEachSeries(msg_, function(item, cb){
-      if(item.originalmid){
-        message.at(item.originalmid, function(err, m){
-          if(err){
-            cb(err);
-          }else{
-            item._doc["originalmsg"] = m;
-            cb();
-          }
-        });
-      }else{
-        cb(); 
-      }
-    }, function(err){
-      err = err ? new error.InternalServer(err) : null;
-      return callback_(err, msg_);
-    });
-  }else{
-    if(!msg_.originalmid){
-      return callback_(null, msg_);
-    }else{
-      message.at(msg_.originalmid, function(err, m){
-        msg_._doc["originalmsg"] = m;
-        return callback_(err, msg_);
-      });
-    }
-  }
-};
+
+// unused source?
+//
+// function checkRepostMessage(msg_, callback_){
+//   if(msg_ instanceof Array){
+//     async.forEachSeries(msg_, function(item, cb){
+//       if(item.originalmid){
+//         message.at(item.originalmid, function(err, m){
+//           if(err){
+//             cb(err);
+//           }else{
+//             item._doc["originalmsg"] = m;
+//             cb();
+//           }
+//         });
+//       }else{
+//         cb(); 
+//       }
+//     }, function(err){
+//       err = err ? new error.InternalServer(err) : null;
+//       return callback_(err, msg_);
+//     });
+//   }else{
+//     if(!msg_.originalmid){
+//       return callback_(null, msg_);
+//     }else{
+//       message.at(msg_.originalmid, function(err, m){
+//         msg_._doc["originalmsg"] = m;
+//         return callback_(err, msg_);
+//       });
+//     }
+//   }
+// };
 
 
 
@@ -903,7 +902,7 @@ exports.getMsgAtList = function(_id, callback_){
 exports.getMsgCommentList = function(_id, callback_){
 
   var tasks = [];
-  var msgsss = [];
+  // var msgsss = [];
   var task_getMyMailList = function(cb){
     message.queryMyMessage(_id,function(err, result){
       err = err ? new error.InternalServer(err) : null;
@@ -920,19 +919,18 @@ exports.getMsgCommentList = function(_id, callback_){
 
   var task_getReplyMailList = function(msgs,cb){
     var msg_id = [];
-      async.forEach(msgs, function(msg){
-        msg_id.push(msg._id);
+    async.forEach(msgs, function(msg){
+      msg_id.push(msg._id);
         
+    });
+    message.queryMsgCommentList(msg_id, function(err, msgs_){
+      err = err ? new error.InternalServer(err) : null;
+      if (err) {
+        return cb(err);
+      } else {
+        cb(err, msgs_);
       }
-    );
-      message.queryMsgCommentList(msg_id, function(err, msgs_){
-          err = err ? new error.InternalServer(err) : null;
-          if (err) {
-            return cb(err);
-          } else {
-            cb(err, msgs_);
-          }
-        });
+    });
   };
   tasks.push(task_getReplyMailList);  
 
@@ -966,11 +964,11 @@ exports.getMsgUnRead = function(option_,timeline_,callback_){
 
 
   var tasks = []
-  , mid_ = option_.mid
-  , uid_ = option_.uid
-  , gid_ = option_.gid
-  , login = option_.login
-  , type = option_.type;
+  // , mid_ = option_.mid
+  // , uid_ = option_.uid
+  // , gid_ = option_.gid
+  , login = option_.login;
+  // , type = option_.type;
 
   var task_getUids = function(cb){
     user.at(login,function(err,user){
@@ -1009,4 +1007,4 @@ exports.getMsgUnRead = function(option_,timeline_,callback_){
   async.waterfall(tasks,function(err,result){
     return callback_(err, result);   
   });
-}
+};
