@@ -3,7 +3,6 @@ var sync      = require("async")
   , _         = require('underscore')
   , user      = lib.ctrl.user
   , group     = lib.ctrl.group
-  , message   = require("./ctrl_message")
   , shortmail = require("./ctrl_shortmail")
   , util      = lib.core.util;
 
@@ -29,13 +28,13 @@ exports.message = function(uid_, callback_) {
         sidemenus.push(result.items[0]);
         callback(err);
       });
-    }],
-    
-    function(err) {
-      callback_(null, {items: sidemenus});
     }
-  );
-}
+  ],
+    
+  function(err) {
+    callback_(err, {items: sidemenus});
+  });
+};
 
 exports.notification = function(callback_) {
   var sidemenu = {
@@ -43,22 +42,22 @@ exports.notification = function(callback_) {
     , "type": "notification"
     , "title": __("navbar.menu.notification")
     , "submenus": []
-  };
+    };
 
   sidemenu.submenus.push({
       "item": "at"
     , "type": "notification"
     , "title": __("sidemenu.message.atme")
-  });
+    });
 
   sidemenu.submenus.push({
       "item": "comment"
     , "type": "notification"
     , "title": __("sidemenu.message.replyme")
-  });
+    });
 
   callback_(null, {items: [sidemenu]});
-}
+};
 
 exports.user = function(uid_, callback_) {
 
@@ -87,19 +86,19 @@ exports.user = function(uid_, callback_) {
       , "type": "folder"
       , "title": __("sidemenu.user.following")
       , "submenus": []
-    }
+      };
     
     _.each(result, function(item){
       sidemenu.submenus.push({
           "item": item._id
         , "type": "user"
         , "title": item.name.name_zh
-      });
+        });
     });
 
     callback_(err, {items: [sidemenu]});
   });
-}
+};
 
 /**
  * 组
@@ -109,7 +108,7 @@ exports.group = function(uid_, callback_) {
   var condition = {
       "uid": uid_
     , "joined":true
-  }
+    };
 
   group.getGroupList(condition, function(err, result){
     
@@ -118,7 +117,7 @@ exports.group = function(uid_, callback_) {
       , "title": __("sidemenu.group")
       , "type": "folder"
       , "submenus": []
-    }
+      };
     
     _.each(result, function(item){
       sidemenu.submenus.push({
@@ -126,61 +125,58 @@ exports.group = function(uid_, callback_) {
           //判断租名字 是否为object类型
         , "title": util.isAllNull(item.name.name_zh)?item.name:item.name.name_zh
         , "type": "group"
-      });
+        });
     });
 
     callback_(err, {items: [sidemenu]});
   });
-}
+};
 
 exports.fulltextsearch = function(uid_, callback_) {
-  var sidemenus = [];
-
   var sidemenu = {
       "item": "filter"
     , "type": "title"
     , "title": "Filter"
     , "submenus": []
-  };
+    };
 
-    sidemenu.submenus.push({
+  sidemenu.submenus.push({
       "item": "all"
     , "type": "fts"
     , "title": "All"
-  });
+    });
 
   sidemenu.submenus.push({
       "item": "user"
     , "type": "fts"
     , "title": __("navbar.menu.user")
-  });
+    });
 
   sidemenu.submenus.push({
       "item": "group"
     , "type": "fts"
     , "title": __("navbar.menu.group")
-  });
+    });
 
   sidemenu.submenus.push({
       "item": "message"
     , "type": "fts"
     , "title": __("navbar.menu.message")
-  });
+    });
     
   callback_(null, {items: [sidemenu]});
-
-}
+};
 
 exports.shortmail = function(uid_, callback_) {
   var sidemenus = [];
 
-  shortmail.getMailUser(uid_, function(err,result){
+  shortmail.getMailUser(uid_, function(err, result){
     var menu = {
         "item": "users"
       , "title": __('shortmail.html.label.talk')
       , "type": "folder"
       , "submenus": []
-    };
+      };
 
     _.each(result.items, function(item){
       menu.submenus.push({
@@ -189,12 +185,13 @@ exports.shortmail = function(uid_, callback_) {
         , "notice": item._doc.unreadCount
         , "href": "/shortmail/" + item._id
         , "type": "sortmail"
-      });
+        });
     });
+
     sidemenus.push(menu);
     callback_(null, {items: sidemenus});
   });
-}
+};
 
 exports.bookmark = function(callback_) {
 
@@ -203,25 +200,26 @@ exports.bookmark = function(callback_) {
     , "type": "folder"
     , "title": __("Bookmark")
     , "submenus": []
-  }
+    };
 
   sidemenu.submenus.push({
       "item": "news"
     , "type": "bookmark"
-    , "title": "新鲜事儿"});
+    , "title": "新鲜事儿"
+    });
   sidemenu.submenus.push({
       "item": "message"
     , "type": "bookmark"
     , "title": "消息"
-  });
+    });
   sidemenu.submenus.push({
       "item": "notice"
     , "type": "bookmark"
     , "title": "通知"
-  });
+    });
 
   callback_(null, {items: [sidemenu]});
-}
+};
 
 exports.files = function(uid_, callback_) {
   var sidemenu = {
@@ -229,7 +227,7 @@ exports.files = function(uid_, callback_) {
     , "type": "folder"
     , "title": __("sidemenu.file.mine")
     , "submenus": []
-  }
+    };
 
   // sidemenu.submenus.push({
   //     "item": "official"
@@ -249,23 +247,24 @@ exports.files = function(uid_, callback_) {
   sidemenu.submenus.push({
       "item": "file"
     , "type": "folder"
-    , "title": __("file.tab.file")});
+    , "title": __("file.tab.file")
+    });
   sidemenu.submenus.push({
       "item": "image"
     , "type": "folder"
     , "title": __("file.tab.image")
-  });
+    });
   sidemenu.submenus.push({
       "item": "video"
     , "type": "folder"
     , "title": __("file.tab.video")
-  });
+    });
   sidemenu.submenus.push({
       "item": "audio"
     , "type": "folder"
     , "title": __("file.tab.audio")
-  });
+    });
 
   callback_(null, {items: [sidemenu]});
 
-}
+};

@@ -1,22 +1,22 @@
 
 var async = require("async")
-  , _ = require("underscore")
   , shortmail = require('../modules/mod_shortmail')
-  , ctrl_user = lib.ctrl.user;
+  , ctrl_user = lib.ctrl.user
+  , errors = lib.core.errors;
 
 exports.getMailUser = function(_id, callback_){
 
   var tasks = [];
   var task_getUsers = function(cb){
 
-  shortmail.getMailUser2(_id, function(err, users){
-      err = err ? new error.InternalServer(err) : null;
-      if (err) {
-        return callback_(err);
-      } else {
-        cb(err, users);
-      }
-    });
+    shortmail.getMailUser2(_id, function(err, users){
+        err = err ? new errors.InternalServer(err) : null;
+        if (err) {
+          return callback_(err);
+        } else {
+          cb(err, users);
+        }
+      });
   };
   tasks.push(task_getUsers);
   
@@ -30,7 +30,7 @@ exports.getContacts = function(uid_, firstLetter_, start_, limit_, callback_){
   var tasks = [];
   var task_getUsers = function(cb){
     ctrl_user.getUserList("all", firstLetter_, uid_, start_, limit_, function(err, users){
-      err = err ? new error.InternalServer(err) : null;
+      err = err ? new errors.InternalServer(err) : null;
       if (err) {
         return callback_(err);
       } else {
@@ -44,7 +44,7 @@ exports.getContacts = function(uid_, firstLetter_, start_, limit_, callback_){
     async.forEach(result.contact, function(user,cb_){
       shortmail.getLastMail(uid_, user._id, function(err, mail){
         if(mail.length>0){
-          user._doc["lastMail"] = mail[0]; 
+          user._doc.lastMail = mail[0]; 
         }
         cb_(err);
       });
@@ -58,7 +58,7 @@ exports.getContacts = function(uid_, firstLetter_, start_, limit_, callback_){
   var task_getUnreadCount = function(result, cb){
     async.forEach(result.contact, function(user,cb_){
       shortmail.getUnreadCount(uid_, user._id, function(err, count){
-        user._doc["unreadCount"] = count; 
+        user._doc.unreadCount = count; 
         cb_(err);
       });
     }
@@ -83,7 +83,7 @@ exports.getEarlierMails = function(_id, _uid, _date, callback_){
 
     if (err) {
       return callback_(err);
-    };
+    }
 
     ctrl_user.appendUser(mails, "createby", function(err, result){
       callback_(err, result);
@@ -99,7 +99,7 @@ exports.getMailList = function(_id, _uid, callback_){
 
     if (err) {
       return callback_(err);
-    };
+    }
 
     ctrl_user.appendUser(mails, "createby", function(err, result){
       callback_(err, result);
@@ -113,13 +113,13 @@ exports.unread = function(uid_, callback_) {
   shortmail.unread(uid_, function(err, result){
     callback_(err, result);
   });
-}
+};
 
 exports.create = function(mail_, callback_) {
   shortmail.create(mail_, function(err, result){
     callback_(err, result);
   });
-}
+};
 
 
 
