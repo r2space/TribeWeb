@@ -135,63 +135,63 @@ exports.read = function(id_, callback_) {
   });
 };
 
-exports.getMailUser = function(id_, callback_){
-  var shortmail = model();
+// exports.getMailUser = function(id_, callback_){
+//   var shortmail = model();
 
-  shortmail.find({'$or':[{'createby' : id_}, {'to':id_}]})
-    .distinct('to', function(err, result){
-      callback_(err, result);
-    });
+//   shortmail.find({'$or':[{'createby' : id_}, {'to':id_}]})
+//     .distinct('to', function(err, result){
+//       callback_(err, result);
+//     });
 
-  return;
+//   return;
 
-  sync.waterfall(
-  [
-    // 获取消息
-    function(callback){
-      shortmail.find({'$or':[{'createby' : id_},{'to':id_}]})
-        .sort({editat:'desc'})
-        .exec(function(err, result){
-          var data ={};
-          data.ids = [];
-          data.unreadCount = {};
-          for(var i in result){
-            if(result[i].createby === id_){
-              if(!_.contains(data.ids, result[i].to)){
-                data.ids.push(result[i].to);
-              }
+//   sync.waterfall(
+//   [
+//     // 获取消息
+//     function(callback){
+//       shortmail.find({'$or':[{'createby' : id_},{'to':id_}]})
+//         .sort({editat:'desc'})
+//         .exec(function(err, result){
+//           var data ={};
+//           data.ids = [];
+//           data.unreadCount = {};
+//           for(var i in result){
+//             if(result[i].createby === id_){
+//               if(!_.contains(data.ids, result[i].to)){
+//                 data.ids.push(result[i].to);
+//               }
               
-            }else{
-              if(!_.contains(data.ids, result[i].createby)){
-                data.ids.push(result[i].createby);
-              }
-              if(!result[i].read){
-                if(data.unreadCount[result[i].createby] === undefined){
-                  data.unreadCount[result[i].createby] = 0;
-                }
-                data.unreadCount[result[i].createby] += 1;
-              }
-            }
-          }
-          callback(err, data);
-        });
-    },
+//             }else{
+//               if(!_.contains(data.ids, result[i].createby)){
+//                 data.ids.push(result[i].createby);
+//               }
+//               if(!result[i].read){
+//                 if(data.unreadCount[result[i].createby] === undefined){
+//                   data.unreadCount[result[i].createby] = 0;
+//                 }
+//                 data.unreadCount[result[i].createby] += 1;
+//               }
+//             }
+//           }
+//           callback(err, data);
+//         });
+//     },
  
-    // 获取用户
-    function(data, callback) {
-      user.find({"_id": {$in: data.ids}}, function(err, result){
-        _.each(result, function(user){
-          user._doc.unreadCount = data.unreadCount[user._id];
-        });
-        callback(err, result);
-      });
-    }
-  ],
-  function(err, all_users) {
-    return new callback_(err, {"items": all_users});
-  }
-  );
-};
+//     // 获取用户
+//     function(data, callback) {
+//       user.find({"_id": {$in: data.ids}}, function(err, result){
+//         _.each(result, function(user){
+//           user._doc.unreadCount = data.unreadCount[user._id];
+//         });
+//         callback(err, result);
+//       });
+//     }
+//   ],
+//   function(err, all_users) {
+//     return new callback_(err, {"items": all_users});
+//   }
+//   );
+// };
 
 exports.getLastMail = function(id_, uid_, callback_){
   var shortmail = model();
