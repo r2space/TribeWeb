@@ -1,14 +1,10 @@
 /**
  * ShortMail:
- * Copyright (c) 2012 Author Name <l_li@dreamarts.co.jp>
- * @see http://10.2.8.224/ssdb
+ * Copyright (c) 2012 Author li
  */
 
 var mongo = require('mongoose')
-  , util = require('util')
-  , log = lib.core.log
   , conn = require('./connection')
-  , dbconf = require('config').db
   , _ = require('underscore')
   , sync = require('async')
   , schema = mongo.Schema
@@ -20,6 +16,7 @@ function model() {
 
 var ShortMail = new schema({
     message: {type: String}
+  , contact: {type: String}
   , read: {type: Number}
   , to: {type: String}
   , attach: [{
@@ -30,11 +27,11 @@ var ShortMail = new schema({
   , createat: {type: Date, description: "创建时间"}
   , editby: {type: String, description: "修改者"}
   , editat: {type: Date, description: "修改时间"}
-  , delete: {type: Number}
-});
+  , remove: {type: Number}
+  });
 
 exports.create = function(mail_, callback_) {
-  var shortmail = conn().model('ShortMail', ShortMail)
+  var shortmail = model()
     , m = new shortmail();
 
   m.message = mail_.message;
@@ -44,7 +41,7 @@ exports.create = function(mail_, callback_) {
   m.createat = new Date();
   m.editby = mail_.by;
   m.editat = new Date();
-  m.delete = 0;
+  m.remove = 0;
 
   m.save(function(err, mail){
     callback_(err, mail);
@@ -52,7 +49,7 @@ exports.create = function(mail_, callback_) {
 };
 
 // exports.unreaded2 = function(userid_, callback_){
-//   var shortmail = conn().model('ShortMail', ShortMail);
+//   var shortmail = model();
 //   sync.waterfall([
 //     function(callback){
 //       shortmail.find({to: userid_, read: 0},{createby:1})
@@ -71,7 +68,7 @@ exports.create = function(mail_, callback_) {
 // };
 
 exports.unread = function(userid_, callback_) {
-  var shortmail = conn().model('ShortMail', ShortMail);
+  var shortmail = model();
 
   sync.waterfall([
 
@@ -118,12 +115,12 @@ exports.unread = function(userid_, callback_) {
       });
 
       result.push({
-        "uid": user._id
+          "uid": user._id
         , "user": user.name.name_zh
         , "photo": user.photo
         , "message": item.message
         , "_id": item._id
-      });
+        });
     });
 
     callback_(err, {list: result, count: mails.count});
@@ -131,15 +128,23 @@ exports.unread = function(userid_, callback_) {
 };
 
 exports.read = function(id_, callback_) {
-  var shortmail = conn().model('ShortMail', ShortMail);
+  var shortmail = model();
 
   shortmail.update({"_id": id_}, {"read": 1}, function(err, count){
     callback_(err, count);
   });
 };
 
-exports.getMailUser2 = function(id_, callback_){
-  var shortmail = conn().model('ShortMail', ShortMail);
+exports.getMailUser = function(id_, callback_){
+  var shortmail = model();
+
+  shortmail.find({'$or':[{'createby' : id_}, {'to':id_}]})
+    .distinct('to', function(err, result){
+      callback_(err, result);
+    });
+
+  return;
+
   sync.waterfall(
   [
     // 获取消息
@@ -168,7 +173,7 @@ exports.getMailUser2 = function(id_, callback_){
               }
             }
           }
-         callback(err, data);
+          callback(err, data);
         });
     },
  
@@ -189,7 +194,7 @@ exports.getMailUser2 = function(id_, callback_){
 };
 
 exports.getLastMail = function(id_, uid_, callback_){
-  var shortmail = conn().model('ShortMail', ShortMail);
+  var shortmail = model();
   shortmail.find({'createby':uid_,'to':id_})
     .sort({createat: -1})
     .limit(1)
@@ -199,7 +204,7 @@ exports.getLastMail = function(id_, uid_, callback_){
 };
 
 exports.getUnreadCount = function(id_, uid_, callback_) {
-  var shortmail = conn().model('ShortMail', ShortMail);
+  var shortmail = model();
 
   shortmail.find({'createby':uid_,'to':id_, read: 0})
           .sort({editat:'desc'})
@@ -207,14 +212,14 @@ exports.getUnreadCount = function(id_, uid_, callback_) {
           .exec(function(err, result){
             callback_(err, result);
           });
-}
+};
 
 exports.getEarlierMails = function(id_, uid_, date_, callback_){
-  var shortmail = conn().model('ShortMail', ShortMail);
+  var shortmail = model();
 
   var condition = {'$or':[{'createby':id_,'to':uid_},{'createby':uid_,'to':id_}]};
   if(date_){
-    condition['createat'] = {$lt: date_};
+    condition.createat = {$lt: date_};
   }
 
   shortmail.find(condition)
@@ -223,11 +228,11 @@ exports.getEarlierMails = function(id_, uid_, date_, callback_){
     .exec(function(err, mails){
       callback_(err, mails.reverse());
     });
-}
+};
 
 exports.getMailList = function(id_, uid_, callback_){
 
-  var shortmail = conn().model('ShortMail', ShortMail);
+  var shortmail = model();
   
   shortmail.find({"read": 0, '$or':[{'createby':id_,'to':uid_},{'createby':uid_,'to':id_}]})
     .sort({createat: 'asc'})
