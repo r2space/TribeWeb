@@ -4,8 +4,8 @@
  */
 
 var mongo = require('mongoose')
-  , util = require('util')
-  , log = lib.core.log
+  // , util = require('util')
+  // , log = lib.core.log
   , conn = require('./connection')
   , solr = lib.core.solr
   , schema = mongo.Schema;
@@ -17,7 +17,7 @@ var Message = new schema({
   , at: {
       users: [String]   // 提到的人
     , groups: [String]   // 提到的组
-  }
+    }
   , range: {type: String} // 发布范围，公开：1 ； 某个组织：组织ID 
   , contentType: {type: String} // 消息内容的类型 textBox:纯文字 imageBox:图片 fileBox:上传文件 videoBox:视频 documentBox:文书一览          
   , content: {type: String}     // 消息文本
@@ -26,9 +26,10 @@ var Message = new schema({
   , createat: {type: Date}
   , editby: {type: String}
   , editat: {type: Date}
+  , likers: [String]    // 赞的列表
   , part: {type: schema.Types.Mixed}
   //, repnums: {type: Number}
-});
+  });
 
 
 /**
@@ -39,7 +40,7 @@ exports.create = function (message_, callback_) {
   var message = model();
 
   new message(message_).save(function(err, result) {
-    solr.update(result, "message", "insert", function(data){});
+    solr.update(result, "message", "insert", function(){});
     callback_(err, result);
   });
 };
@@ -48,12 +49,12 @@ exports.create = function (message_, callback_) {
 /**
  * 删除消息
  */
-exports.delete = function(mid_, callback_) {
+exports.remove = function(mid_, callback_) {
 
   var message = model();
 
   message.findByIdAndRemove(mid_, function(err, result) {
-    solr.update(result, "message", "delete", function(data){});
+    solr.update(result, "message", "delete", function(){});
     callback_(err, result);
   });
 };
@@ -67,9 +68,38 @@ exports.update = function(mid_, newvals_, callback_) {
   var message = model();
 
   message.findByIdAndUpdate(mid_, newvals_, function(err, result) {
-    solr.update(result, "message", "update", function(data){});
+    solr.update(result, "message", "update", function(){});
     callback_(err, result);
   });
+};
+
+
+/**
+ * 赞一个消息
+ */
+exports.like = function(mid_, uid_, callback_){
+  var message = model();
+  message.findByIdAndUpdate(
+      mid_
+    , {$addToSet: {likers: uid_}}
+    , {upsert:true}
+    , function(err, result){
+      callback_(err, result);
+    });
+};
+
+/**
+ * 取消赞
+ */
+exports.unlike = function(mid_, uid_, callback_){
+  var message = model();
+  message.findByIdAndUpdate(
+      mid_
+    , {$pull: {likers: uid_}}
+    , {upsert:true}
+    , function(err, result){
+      callback_(err, result);
+    });
 };
 
 
@@ -117,11 +147,11 @@ exports.list = function(option_, start_, limit_, timeline_, callback_) {
   // 开始位置,返回个数
   var beforeCondition = {};
   if(before){ // 取before前的消息
-    beforeCondition['createat'] = {$lt: before};
+    beforeCondition.createat = {$lt: before};
   } else {
-    options["skip"] = start_ || 0;
+    options.skip = start_ || 0;
   }
-  options["limit"] = limit_ || 20;
+  options.limit = limit_ || 20;
 
   // 获取，指定的人发布的公开消息
   if (uids && uids.length > 0) {
@@ -151,12 +181,12 @@ exports.list = function(option_, start_, limit_, timeline_, callback_) {
   .where("type").equals(1)
   .or(condition)
   .exec(function(err, count){
-      message.find(beforeCondition).setOptions(options)
-      .where("type").equals(1)
-      .or(condition)
-      .exec(function(err, messages){
-        callback_(err, {total:count, items:messages});
-      });
+    message.find(beforeCondition).setOptions(options)
+    .where("type").equals(1)
+    .or(condition)
+    .exec(function(err, messages){
+      callback_(err, {total:count, items:messages});
+    });
   });
 };
 
@@ -175,8 +205,8 @@ exports.unreadMessageCount = function(option_, start_, limit_, timeline_, callba
     , range = option_.range;
 
   // 开始位置,返回个数
-  options["skip"] = start_ || 0;
-  options["limit"] = limit_ || 20;
+  options.skip = start_ || 0;
+  options.limit = limit_ || 20;
 
   // 获取，指定的人发布的公开消息
   if (uids && uids.length > 0) {
@@ -207,15 +237,15 @@ exports.unreadMessageCount = function(option_, start_, limit_, timeline_, callba
   .where("type").equals(1)
   .or(condition)
   .exec(function(err, count){
-      //console.log(count);
-      //message.find().setOptions(options)
-      //.where("createat").gt(timeline_)
-      //.where("createby").equals("/^.+(?!'"+option_.login+"')$/")
-      //.where("type").equals(1)
-      //.or(condition)
-      //.exec(function(err, messages){
-        callback_(err, {total:count});
-      //});
+    //console.log(count);
+    //message.find().setOptions(options)
+    //.where("createat").gt(timeline_)
+    //.where("createby").equals("/^.+(?!'"+option_.login+"')$/")
+    //.where("type").equals(1)
+    //.or(condition)
+    //.exec(function(err, messages){
+    callback_(err, {total:count});
+    //});
   });
 };
 
@@ -251,8 +281,8 @@ exports.boxList = function(uid_, start_, limit_, callback_) {
   var message = model()
     , options = {"sort": {"createat": "desc"}};
 
-  options["skip"] = start_ || 0;
-  options["limit"] = limit_ || 20;
+  options.skip = start_ || 0;
+  options.limit = limit_ || 20;
 
   message.count({"type":"2","createby":uid_})
   .exec(function(err, count){
@@ -277,8 +307,8 @@ exports.replyList = function(mid_, start_, limit_, callback_) {
   var message = model()
     , options = {"sort": {"createat": "desc"}};
 
-  options["skip"] = start_ || 0;
-  options["limit"] = limit_ || 20;
+  options.skip = start_ || 0;
+  options.limit = limit_ || 20;
 
   message.count({"type":"2","target":mid_})
   .exec(function(err, count){
@@ -297,8 +327,8 @@ exports.forwardList = function(mid_, start_, limit_, callback_) {
   var message = model()
     , options = {"sort": {"createat": "desc"}};
 
-  options["skip"] = start_ || 0;
-  options["limit"] = limit_ || 20;
+  options.skip = start_ || 0;
+  options.limit = limit_ || 20;
 
   message.count({"type":"1","target":mid_})
   .exec(function(err, count){
@@ -346,35 +376,35 @@ exports.forwardListNum = function(mid_, callback_) {
  * @param {String} id_        原消息ID
  */
 exports.queryMsgAtList = function(id_, callback_){
-    var message = model();
-    message.find({"at": {
-          "groups": [],
-          "users": [id_]
-        }}).exec(function(err,result){
-      callback_(err,result);
-    });
-}
+  var message = model();
+  message.find({"at": {
+    "groups": [],
+    "users": [id_]
+  }}).exec(function(err,result){
+    callback_(err,result);
+  });
+};
 
 /**
  *  获得我发的消息
  * @param {String} id_        用户_id
  */
 exports.queryMyMessage  = function(id_, callback_){
-    var message = model();
-    message.find({"type":"1","createby":id_}).exec(function(err,result){
-      callback_(err,result);
-    });
-}
+  var message = model();
+  message.find({"type":"1","createby":id_}).exec(function(err,result){
+    callback_(err,result);
+  });
+};
 /**
  * 获得评论我的消息
  * @param {String} mid_        我发的消息ID
  */
 exports.queryMsgCommentList = function(mid_, callback_){
-    var message = model();
-    message.find({"type":"2","target":{$in: mid_}}).exec(function(err,result){
-      callback_(err,result);
-    });
-}
+  var message = model();
+  message.find({"type":"2","target":{$in: mid_}}).exec(function(err,result){
+    callback_(err,result);
+  });
+};
 
 
 

@@ -166,6 +166,36 @@ exports.deleteMessage = function(req_, res_){
   });
 };
 
+exports.like = function(req_, res_){
+  var mid = util.checkString(req_.body.mid);
+  var uid = req_.session.user._id;
+  message.like(mid, uid, function(err, result){
+    if(err){
+      return res_.send({
+          "code": err.code
+        , "msg": err.message
+        });
+    }else{
+      return res_.send(json.dataSchema(result));
+    }
+  });
+};
+
+exports.unlike = function(req_, res_){
+  var mid = util.checkString(req_.body.mid);
+  var uid = req_.session.user._id;
+  message.unlike(mid, uid, function(err, result){
+    if(err){
+      return res_.send({
+          "code": err.code
+        , "msg": err.message
+        });
+    }else{
+      return res_.send(json.dataSchema(result));
+    }
+  });
+};
+
 /**
  * getMessage:
  *  查询单条消息

@@ -137,6 +137,28 @@ exports.deleteMessage = function (mid_, callback_){
   });
 };
 
+exports.like = function (mid_, uid_, callback_){
+  if(!mid_){
+    return callback_(new error.BadRequest("消息ID不能为空"));
+  }
+
+  message.like(mid_,uid_, function(err, msg){
+    err = err ? new error.InternalServer(err) : null;
+    return callback_(err, msg);
+  });
+};
+
+exports.unlike = function (mid_, uid_, callback_){
+  if(!mid_){
+    return callback_(new error.BadRequest("消息ID不能为空"));
+  }
+
+  message.unlike(mid_,uid_, function(err, msg){
+    err = err ? new error.InternalServer(err) : null;
+    return callback_(err, msg);
+  });
+};
+
 /**
  * 获取消息一览
  */
