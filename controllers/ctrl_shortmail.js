@@ -1,28 +1,45 @@
 
 var async = require("async")
+  , _ = require("underscore")
   , shortmail = require('../modules/mod_shortmail')
+  , contact = require('../modules/mod_contact')
   , ctrl_user = lib.ctrl.user
   , error = lib.core.errors;
 
 exports.getMailUser = function(_id, callback_){
 
-  var tasks = [];
-  var task_getUsers = function(cb){
+  contact.findByUser(_id, function(err, result){
 
-    shortmail.getMailUser2(_id, function(err, users){
-      err = err ? new error.InternalServer(err) : null;
-      if (err) {
-        return callback_(err);
-      } else {
-        cb(err, users);
-      }
+    // 内部错误
+    if (err) {
+      return callback_(new error.InternalServer(err), result);
+    }
+
+    // 没有数据
+    if (result.length < 1) {
+      return callback_(err, []);
+    }
+
+    // 转换数据格式
+    var users = [];
+    _.each(result, function(item){
+
+      var u = item.member[0] == _id ? item.member[1] : item.member[0];
+      users.push({
+          _id: item._id
+        , lastMessage: item.lastMessage
+        , person: u
+        , member: item.member
+        , editby: item.editby
+        });
     });
-  };
-  tasks.push(task_getUsers);
-  
-  async.waterfall(tasks,function(err,users){
-    return callback_(err, users);
+
+    // 设定用户信息
+    ctrl_user.appendUser(users, "person", function(err, result){
+      callback_(err, result);
+    });
   });
+
 };
 
 exports.getContacts = function(uid_, firstLetter_, start_, limit_, callback_){
@@ -34,7 +51,7 @@ exports.getContacts = function(uid_, firstLetter_, start_, limit_, callback_){
       if (err) {
         return callback_(err);
       } else {
-        cb(err, {contact: users});
+        cb(err, {"contact": users});
       }
     });
   };
@@ -116,9 +133,16 @@ exports.unread = function(uid_, callback_) {
 };
 
 exports.create = function(mail_, callback_) {
-  shortmail.create(mail_, function(err, result){
-    callback_(err, result);
+
+  contact.createOneOnOne(mail_.by, mail_.to, mail_.message, function(err, result){
+    if (err) {callback_(err, result);}
+
+    mail_.contact = result._id;
+    shortmail.create(mail_, function(err, result){
+      callback_(err, result);
+    });
   });
+
 };
 
 

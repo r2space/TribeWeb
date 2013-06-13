@@ -55,7 +55,7 @@ exports.getMailUser = function(req_, res_) {
     if (err) {
       return res_.send(json.errorSchema(err.code, err.message));
     } else {
-      return res_.send(json.dataSchema(result));
+      return res_.send(json.dataSchema({items: result}));
     }
   });
 };
