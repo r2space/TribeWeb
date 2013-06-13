@@ -16,7 +16,7 @@ function model() {
 
 var ShortMail = new schema({
     message: {type: String}
-  , contact: {type: String}
+  , contact: {type: String, description: "对话组"}
   , read: {type: Number}
   , to: {type: String}
   , attach: [{
@@ -235,6 +235,28 @@ exports.getMailList = function(id_, uid_, callback_){
   var shortmail = model();
   
   shortmail.find({"read": 0, '$or':[{'createby':id_,'to':uid_},{'createby':uid_,'to':id_}]})
+    .sort({createat: 'asc'})
+    .exec(function(err, mails){
+
+      // 更新为以读
+      sync.forEach(mails, function(mail, cb) {
+        if (mail.createby != id_ && mail.read != 1) {
+          shortmail.findByIdAndUpdate(mail._id, {"read": 1},function(err, m) {
+            mail = m;
+            cb(err);
+          });
+        }
+      });
+
+      callback_(err, mails);
+    });
+};
+
+exports.getByContact = function(contact_, callback_) {
+
+  var shortmail = model();
+  
+  shortmail.find({contact: contact_})
     .sort({createat: 'asc'})
     .exec(function(err, mails){
 
