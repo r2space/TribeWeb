@@ -1,10 +1,10 @@
 var message = require('../controllers/ctrl_message')
   , api_message = require('../api/message')
-  , amqp = lib.core.amqp
+  // , amqp = lib.core.amqp
   , util = lib.core.util
-  , json = lib.core.json
-  , dbfile = lib.ctrl.dbfile
-  , notification = lib.ctrl.notification;
+  , json = lib.core.json;
+  // , dbfile = lib.ctrl.dbfile
+  // , notification = lib.ctrl.notification;
 
 /**
  * createMessage:
@@ -64,7 +64,7 @@ exports.copyMessage = function(req_, res_){
 /*
   我发出的评论的Api
 */ 
-exports.getMessageBoxList = function(req_, res_, option_) {
+exports.getMessageBoxList = function(req_, res_) {
 
   var start = Number(util.checkString(req_.query.start));
   var count = Number(util.checkString(req_.query.count));
@@ -93,7 +93,7 @@ exports.getMessageList = function(req_, res_, option_) {
 
   var start = Number(util.checkString(req_.query.start));
   var count = Number(util.checkString(req_.query.count));
-  option_["before"] = req_.query.before;
+  option_.before = req_.query.before;
 
   message.getMessageList(option_, start, count, function(err, result) {
     if (err) {
@@ -159,7 +159,7 @@ exports.deleteMessage = function(req_, res_){
       return res_.send({
           "code": err.code
         , "msg": err.message
-      });
+        });
     }else{
       return res_.send(result);
     }
@@ -259,7 +259,7 @@ exports.addReply = function(req_, res_){
       return res_.send({
           "code": err.code
         , "msg": err.message
-      });
+        });
     }else{
       return res_.send(result);
     }
@@ -300,26 +300,26 @@ exports.getMsgAtList = function(req_,res_){
   var _id = req_.session.user._id;
 
 
-    message.getMsgAtList(_id, function(err, result){
-      if (err) {
-        res_.send({msg: 'bad request exception'});
-      } else {
-        res_.send(json.dataSchema({items: result}));
-      }
-    });
+  message.getMsgAtList(_id, function(err, result){
+    if (err) {
+      res_.send({msg: 'bad request exception'});
+    } else {
+      res_.send(json.dataSchema({items: result}));
+    }
+  });
 };
 
 exports.getMsgCommentList = function(req_,res_){
   //获取我的uid
   var _id = req_.session.user._id;
 
-    message.getMsgCommentList(_id, function(err, result){
-      if (err) {
-        res_.send({msg: 'bad request exception'});
-      } else {
-        res_.send(json.dataSchema({items: result}));
-      }
-    });
+  message.getMsgCommentList(_id, function(err, result){
+    if (err) {
+      res_.send({msg: 'bad request exception'});
+    } else {
+      res_.send(json.dataSchema({items: result}));
+    }
+  });
 
 };
 
@@ -327,16 +327,16 @@ exports.getMsgCommentList = function(req_,res_){
 exports.getMsgUnRead = function(req_,res_){
   //获取我的uid
   var option = {
-    "login" : req_.session.user._id ,
+    "login" : req_.session.user._id
   };
   var _timeline = req_.query.timeline;
   message.getMsgUnRead(option,_timeline,function(err,result){
     if (err) {
-        res_.send({msg: 'bad request exception'});
-      } else {
-        res_.send(json.dataSchema({items: result}));
-      }
+      res_.send({msg: 'bad request exception'});
+    } else {
+      res_.send(json.dataSchema({items: result}));
+    }
   });
 
-}
+};
 
