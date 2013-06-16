@@ -1,7 +1,7 @@
 {  
   "db": {
-       // "host": "127.0.0.1"
-     "host": "10.2.8.235"
+       "host": "127.0.0.1"
+     // "host": "10.2.3.205"
     , "port": 27017
     , "dbname": "smart"
     , "pool": 5
@@ -69,5 +69,13 @@
     , "user": "guest"
     , "password": "guest"
     , "queue": "smartPhoto"
+  },
+  "mq_apn": {
+      "host": "10.2.8.232"
+    , "port": 5672
+    , "user": "guest"
+    , "password": "guest"
+    , "queue": "smartApn"
   }
+
 }

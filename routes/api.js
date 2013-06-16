@@ -1,7 +1,5 @@
 
-var process       = require('../api/process')
-  , topic         = require('../api/topic')
-  , sidemenu      = require('../api/sidemenu')
+var sidemenu      = require('../api/sidemenu')
   , shortmail     = require('../api/shortmail');
 
 var groupapi      = require('./api_group')  
@@ -30,7 +28,7 @@ exports.guiding = function(app){
 
   // 获取图片  
   app.get('/picture/:id', function(req, res){
-    smartapi.dbfile.image(req, res, function(err, doc, info){
+    smartapi.dbfile.image(req, res, function(err, doc){
       res.send(doc);
     });
   });
@@ -90,5 +88,18 @@ exports.guiding = function(app){
     smartapi.notification.read(req, res);
   });
   
+    // 更新APNs的设备号
+  app.put("/notification/addtoken.json", function(req, res){
+    smartapi.apn.update(req, res);
+  });
+  
+  app.get("/notification/gettoken.json", function(req, res){
+    smartapi.apn.find(req, res);
+  });
+
+  app.put("/notification/cleartoken.json", function(req, res){
+    smartapi.apn.clear(req, res);
+  });
+
 };
 

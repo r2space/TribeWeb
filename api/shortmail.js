@@ -22,10 +22,15 @@ exports.sendPrivateMessage = function(req_, res_) {
     } else {
 
       // 保存成功发送消息
-      amqp.notice({
-          _id: mail.to
-        , msg: mail.message
+      // amqp.notice({
+      //     _id: mail.to
+      //   , msg: mail.message
+      //   });
+      amqp.sendApn({
+          target: mail.to
+        , body: mail.message
         });
+      console.log(mail.message);
 
       return res_.send(json.dataSchema(result));
     }
