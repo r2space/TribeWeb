@@ -51,6 +51,18 @@ exports.at = function(contactid_, callback_) {
 };
 
 /**
+ *
+ */
+exports.update = function(contactid_, obj_, callback_) {
+
+  var contact = model();
+
+  contact.findByIdAndUpdate(contactid_, obj_, function(err, result) {
+    callback_(err, result);
+  });
+};
+
+/**
  * create的简易版
  * 如果不存在，则创建两人的对话
  */
@@ -61,14 +73,19 @@ exports.createOneOnOne = function(uid1_, uid2_, lastMessage_, callback_) {
       callback_(err, result);
     }
 
-    // 存在，则返回(返回第一个)
+    var obj;
+    var date = new Date();
+
+    // 存在，更新最终消息，并返回
     if (result && result.length > 0) {
-      return callback_(err, result[0]);
+      obj = {lastMessage: lastMessage_, editat: date, editby: uid1_};
+      return exports.update(result[0]._id, obj, function(err, result){
+        callback_(err, result);
+      });
     }
 
     // 不存在，创建
-    var date = new Date();
-    var obj = {
+    obj = {
         member: [uid1_, uid2_]
       , lastMessage: lastMessage_
       , createby: uid1_
@@ -107,7 +124,7 @@ exports.findByUser = function(uid_, callback_) {
   var contact = model()
     , condition = {member: uid_};
 
-  contact.find(condition, function(err, result){
+  contact.find(condition).sort({editat: 'desc'}).exec(function(err, result){
     callback_(err, result);
   });
 };
