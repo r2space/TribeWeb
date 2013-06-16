@@ -1,6 +1,5 @@
 
-var log = lib.core.log
-  , message = require('../api/message');
+var message = require('../api/message');
 
 /**
  * GuidingMessageApi:
@@ -41,9 +40,9 @@ exports.guiding = function(app){
     message.getGroupHomePageMessageList(req, res);
   });
 
-  app.delete('/message/delete.json', function(req, res){
-    message.deleteMessage(req, res);
-  });
+  // app.delete('/message/delete.json', function(req, res){
+  //   message.deleteMessage(req, res);
+  // });
 
   app.get("/message/list/reply.json", function(req, res){
     message.getReplyList(req, res);
@@ -63,6 +62,14 @@ exports.guiding = function(app){
 
   app.get("/message/list/unread.json", function(req, res){
     message.getMsgUnRead(req, res);
+  });
+
+  app.put("/message/like.json", function(req, res){
+    message.like(req, res);
+  });
+
+  app.put("/message/unlike.json", function(req, res){
+    message.unlike(req, res);
   });
 
 };
