@@ -28,6 +28,11 @@ var Message = new schema({
   , editat: {type: Date}
   , part: {type: schema.Types.Mixed}
   //, repnums: {type: Number}
+  , thumb : {
+      fileid : {type:String}
+    , width: {type:Number}
+    , height : {type:Number}
+  }
 });
 
 

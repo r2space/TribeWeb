@@ -55,6 +55,14 @@
     , "libs": "../SmartCore"
   },
   
+  "thumbq" : {
+      "host":"10.2.8.232"
+    , "port":5672
+    , "user":"guest"
+    , "password":"guest"
+    , "queue":"smartThumb"
+    , "thumb_queue":"smartThumb"
+  },
   "mq": {
       "host": "10.2.8.232"
     , "port": 5672
