@@ -35,6 +35,7 @@ exports.create = function(mail_, callback_) {
     , m = new shortmail();
 
   m.message = mail_.message;
+  m.contact = mail_.contact;
   m.read = 0;
   m.to = mail_.to;
   m.createby = mail_.by;
@@ -214,6 +215,24 @@ exports.getUnreadCount = function(id_, uid_, callback_) {
           });
 };
 
+
+// 通过会话的ID，获取内容
+exports.getStoryByContact = function(contact_, date_, limit_, callback_) {
+
+  var shortmail = model();
+  var condition = {contact: contact_};
+  if(date_){
+    condition.createat = {$lt: date_};
+  }
+
+  shortmail.find(condition)
+    .sort({"createat": 'asc'})
+    .limit(limit_)
+    .exec(function(err, mails){
+      callback_(err, mails);
+    });
+};
+
 exports.getEarlierMails = function(id_, uid_, date_, callback_){
   var shortmail = model();
 
@@ -255,7 +274,7 @@ exports.getMailList = function(id_, uid_, callback_){
 exports.getByContact = function(contact_, callback_) {
 
   var shortmail = model();
-  
+
   shortmail.find({contact: contact_})
     .sort({createat: 'asc'})
     .exec(function(err, mails){

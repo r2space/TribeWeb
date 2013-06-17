@@ -31,6 +31,7 @@ exports.getMailUser = function(_id, callback_){
         , person: u
         , member: item.member
         , editby: item.editby
+        , editat: item.editat
         });
     });
 
@@ -94,34 +95,47 @@ exports.getContacts = function(uid_, firstLetter_, start_, limit_, callback_){
 };
 
 
-exports.getEarlierMails = function(_id, _uid, _date, callback_){
+exports.getEarlierMails = function(contact_, date_, limit_, callback_){
 
-  shortmail.getEarlierMails(_id, _uid, _date, function(err, mails){
-
-    if (err) {
-      return callback_(err);
-    }
-
-    ctrl_user.appendUser(mails, "createby", function(err, result){
-      callback_(err, result);
-    });
-
+  shortmail.getEarlierMails(contact_, date_, limit_, function(err, result){
+    err = err ? new error.InternalServer(err) : null; 
+    callback_(err, result);
   });
 };
+// exports.getEarlierMails = function(_id, _uid, _date, callback_){
+
+//   shortmail.getEarlierMails(_id, _uid, _date, function(err, mails){
+
+//     if (err) {
+//       return callback_(err);
+//     }
+
+//     ctrl_user.appendUser(mails, "createby", function(err, result){
+//       callback_(err, result);
+//     });
+
+//   });
+// };
 
 // 获取与指定人的对话
-exports.getMailList = function(_id, _uid, callback_){
+exports.getMailList = function(contact_, date_, limit_, callback_){
 
-  shortmail.getMailList(_id, _uid, function(err, mails) {
+  shortmail.getStoryByContact(contact_, date_, limit_, function(err, result){
+    err = err ? new error.InternalServer(err) : null; 
 
-    if (err) {
-      return callback_(err);
-    }
-
-    ctrl_user.appendUser(mails, "createby", function(err, result){
-      callback_(err, result);
-    });
+    callback_(err, result);
   });
+
+  // shortmail.getMailList(_id, _uid, function(err, mails) {
+
+  //   if (err) {
+  //     return callback_(err);
+  //   }
+
+  //   ctrl_user.appendUser(mails, "createby", function(err, result){
+  //     callback_(err, result);
+  //   });
+  // });
 };
 
 
@@ -132,6 +146,7 @@ exports.unread = function(uid_, callback_) {
   });
 };
 
+// 添加一句话
 exports.create = function(mail_, callback_) {
 
   contact.createOneOnOne(mail_.by, mail_.to, mail_.message, function(err, result){

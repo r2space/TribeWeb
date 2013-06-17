@@ -22,12 +22,17 @@ exports.sendPrivateMessage = function(req_, res_) {
     } else {
 
       // 保存成功发送消息
-      amqp.notice({
-          _id: mail.to
-        , msg: mail.message
+      // amqp.notice({
+      //     _id: mail.to
+      //   , msg: mail.message
+      //   });
+      amqp.sendApn({
+          target: mail.to
+        , body: mail.message
         });
+      console.log(mail.message);
 
-      return res_.send(json.dataSchema({"items": result}));
+      return res_.send(json.dataSchema(result));
     }
   });
 };
@@ -78,29 +83,42 @@ exports.getContacts = function(req_, res_) {
 
 exports.getMailList = function(req_, res_) {
 
-  var _id = req_.session.user._id;
-  var uid = req_.query.uid
-    , type = req_.query.type
-    , date = req_.query.date;
+  var contact = req_.query.contact
+    , date = req_.query.date
+    , count = req_.query.date;
 
-  if (type === "earlier") {
-    shortmail.getEarlierMails(_id, uid, date, function(err, result){
-      if (err) {
-        return res_.send(json.errorSchema(err.code, err.message));
-      } else {
-        return res_.send(json.dataSchema({"items": result}));
-      }
-    });
+  shortmail.getMailList(contact, date, count, function(err, result){
+    if (err) {
+      return res_.send(json.errorSchema(err.code, err.message));
+    } else {
+      return res_.send(json.dataSchema({"items": result}));
+    }
+  });
 
-  } else {
-    shortmail.getMailList(_id, uid, function(err, result){
-      if (err) {
-        return res_.send(json.errorSchema(err.code, err.message));
-      } else {
-        return res_.send(json.dataSchema({"items": result}));
-      }
-    });
-  }
+
+  // var _id = req_.session.user._id;
+  // var uid = req_.query.uid
+  //   , type = req_.query.type
+  //   , date = req_.query.date;
+
+  // if (type === "earlier") {
+  //   shortmail.getEarlierMails(_id, uid, date, function(err, result){
+  //     if (err) {
+  //       return res_.send(json.errorSchema(err.code, err.message));
+  //     } else {
+  //       return res_.send(json.dataSchema({"items": result}));
+  //     }
+  //   });
+
+  // } else {
+  //   shortmail.getMailList(_id, uid, function(err, result){
+  //     if (err) {
+  //       return res_.send(json.errorSchema(err.code, err.message));
+  //     } else {
+  //       return res_.send(json.dataSchema({"items": result}));
+  //     }
+  //   });
+  // }
 };
 
 exports.getEarlierMails = function(req_, res_){
