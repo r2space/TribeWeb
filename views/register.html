@@ -22,7 +22,7 @@
         <form id="registerform" method="post" action="/register">
           <input type="hidden" id="_csrf" name="_csrf" value="<%= token %>" />
           <input type="hidden" name="_method" value="post" />
-          <input type="text" id="email" name="email" value="l_li@dreamarts.co.jp" placeholder="Email" />
+          <input type="text" id="email" name="email" value="" placeholder="Email" />
           <a href="#" onclick="register(); return false;">
             <i id="animate" class="icon-asterisk icon-spin"></i><%= i('register.html.label.register') %><!-- 注册 -->
           </a>
@@ -31,7 +31,7 @@
     </section>
     
     <footer>
-      <p>Copyright © 2012, DreamArts Corporation. All Rights Reserved.</p>
+      <p>Copyright © 2012, Cross Corporation. All Rights Reserved.</p>
     </footer>
   </body>
 </html>
