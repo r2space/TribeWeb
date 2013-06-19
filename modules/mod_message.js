@@ -45,7 +45,7 @@ exports.create = function (message_, callback_) {
   var message = model();
 
   new message(message_).save(function(err, result) {
-    solr.update(result, "message", "insert", function(){});
+    // solr.update(result, "message", "insert", function(){});
     callback_(err, result);
   });
 };
