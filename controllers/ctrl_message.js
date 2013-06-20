@@ -1,5 +1,5 @@
 var async = require("async")
-  // , amqp = lib.core.amqp
+  , amqp = lib.core.amqp
   , _ = require("underscore")
   , i18n    = require('i18n')
 
@@ -81,11 +81,11 @@ exports.createMessage = function(currentuid_, params_, callback_){
       }
       if(fids.length > 0){
         amqp.smartThumb({
-                fids:fids.join(),
-                msg_id:msg._id,
-                collection:"messages",
-                width:"500"
-              });
+          fids:fids.join(),
+          msg_id:msg._id,
+          collection:"messages",
+          width:"500"
+        });
       }
       
     }
