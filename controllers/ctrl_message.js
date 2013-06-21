@@ -61,15 +61,18 @@ exports.createMessage = function(currentuid_, params_, callback_){
     if (err) {
       return callback_(new error.InternalServer(err));
     }
+    //TODO 评论的时候这部分可能出错
+
     if(msg.target){
       message.at(msg.target, function(err, msgtarget){
         if(msgtarget.createby)
         {
-          msg.part.targetcreateby = msgtarget.createby;
+          msg.part = {targetcreateby :msgtarget.createby};
+          ctrl_notification.createForMessage(msg);
         }
       });
     }
-    ctrl_notification.createForMessage(msg);
+    
     
      
     // 更新全文检索索引
