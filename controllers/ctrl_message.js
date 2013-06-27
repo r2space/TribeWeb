@@ -296,7 +296,7 @@ exports.getMessageList = function(option_, start_, count_, callback_){
     async.forEach(msgs.items, function(msg, cb_) {
       if(msg.range != "1"){
         group.at(msg.range, function(err, u) {
-          msg.part.range = {id: u._id, name: u.name, photo: u.photo};
+          msg.part.range = u;
           cb_(err);
         });
       } else {
