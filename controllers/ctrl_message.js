@@ -1,7 +1,7 @@
 var async = require("async")
   , amqp = lib.core.amqp
   , _ = require("underscore")
-  , i18n    = require('i18n')
+  // , i18n    = require('i18n')
 
   , ctrl_notification = lib.ctrl.notification
   , ctrl_user = lib.ctrl.user
@@ -129,7 +129,9 @@ exports.copyMessage = function(currentuid_, params_, callback_){
     
     newMessage.range = range;
     newMessage.contentType = original.contentType;
-    newMessage.content = content + i18n.__("message.forward.label.forward") + original.content;
+    // TODO转发的对应
+    // 转发字符的临时对应
+    newMessage.content = content + "\n>" + original.content;
     newMessage.createby = currentuid_;
     newMessage.createat = currentdate;
     newMessage.editby = currentuid_;
