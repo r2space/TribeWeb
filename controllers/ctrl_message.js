@@ -68,11 +68,11 @@ exports.createMessage = function(currentuid_, params_, callback_){
         if(msgtarget.createby)
         {
           msg.part = {targetcreateby :msgtarget.createby};
-          ctrl_notification.createForMessage(msg);
+          
         }
       });
     }
-    
+    ctrl_notification.createForMessage(msg);
     
      
     // 更新全文检索索引
