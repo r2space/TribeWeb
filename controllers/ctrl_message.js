@@ -62,17 +62,20 @@ exports.createMessage = function(currentuid_, params_, callback_){
       return callback_(new error.InternalServer(err));
     }
     //TODO 评论的时候这部分可能出错
-
+    //TIPS ： 这部分代码同时对应 评论  和 提到我 的功能  START
     if(msg.target){
       message.at(msg.target, function(err, msgtarget){
         if(msgtarget.createby)
         {
           msg.part = {targetcreateby :msgtarget.createby};
+          ctrl_notification.createForMessage(msg);
           
         }
       });
+    }else{
+      ctrl_notification.createForMessage(msg);
     }
-    ctrl_notification.createForMessage(msg);
+    //TIPS ： 这部分代码同时对应 评论  和 提到我 的功能  END
     
      
     // 更新全文检索索引
